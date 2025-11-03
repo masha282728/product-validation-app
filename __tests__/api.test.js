@@ -3,7 +3,7 @@ const app = require('../src/app');
 const db = require('../src/db');
 
 beforeEach(() => {
-  db.clear(); // очищаем базу перед каждым тестом
+  db.clear(); 
 });
 
 describe('API integracyjne', () => {

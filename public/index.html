@@ -1,44 +1,130 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8"/>
-  <title>Formularz — walidacja</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rejestracja produktu</title>
   <style>
-    .error { color: #b00020; font-size: 0.9rem; }
-    .field-error { border-color: #b00020; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f9fc;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 450px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 2px rgba(74,144,226,0.2);
+      outline: none;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-size: 0.85rem;
+      margin-top: 0.2rem;
+    }
+
+    .field-error {
+      border-color: #e74c3c;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #357ab8;
+    }
+
+    #form-general-error {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
-  <h1>Rejestracja produktu</h1>
-  <form id="form" novalidate>
-    <label>
-      Name
-      <input name="name" required minlength="3" maxlength="50"/>
-      <div class="error" data-for="name"></div>
-    </label><br/>
-    <label>
-      Email
-      <input type="email" name="email" required/>
-      <div class="error" data-for="email"></div>
-    </label><br/>
-    <label>
-      Price
-      <input type="number" name="price" required step="0.01" min="0.01"/>
-      <div class="error" data-for="price"></div>
-    </label><br/>
-    <label>
-      Birth Date
-      <input type="date" name="birthDate" required/>
-      <div class="error" data-for="birthDate"></div>
-    </label><br/>
-    <label>
-      Code
-      <input name="code" required pattern="^[A-Za-z0-9\\-]{4,20}$"/>
-      <div class="error" data-for="code"></div>
-    </label><br/>
-    <button type="submit">Wyślij</button>
-    <div id="form-general-error" class="error"></div>
-  </form>
+  <div class="container">
+    <h1>Rejestracja produktu</h1>
+    <form id="form" novalidate>
+      <label>
+        Name
+        <input id="name" name="name" required minlength="3" maxlength="50" />
+        <div class="error" data-for="name"></div>
+      </label>
+
+      <label>
+        Email
+        <input id="email" name="email" type="email" required />
+        <div class="error" data-for="email"></div>
+      </label>
+
+      <label>
+        Price
+        <input id="price" name="price" type="number" required step="0.01" min="0.01" />
+        <div class="error" data-for="price"></div>
+      </label>
+
+      <label>
+        Birth Date
+        <input id="birthDate" name="birthDate" type="date" required />
+        <div class="error" data-for="birthDate"></div>
+      </label>
+
+      <label>
+        Code
+        <input id="code" name="code" required pattern="^[A-Za-z0-9\-]{4,20}$" />
+        <div class="error" data-for="code"></div>
+      </label>
+
+      <button type="submit">Wyślij</button>
+      <div id="form-general-error" class="error"></div>
+    </form>
+  </div>
 
   <script>
     const form = document.getElementById('form');
@@ -49,18 +135,18 @@
       const name = formData.get('name')?.trim() || '';
       if (!name || name.length < 3 || name.length > 50) errors.name = 'Name: 3-50 znaków.';
       const email = formData.get('email') || '';
-      if (!/^\\S+@\\S+\\.\\S+$/.test(email)) errors.email = 'Niepoprawny format email.';
+      if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = 'Niepoprawny format email.';
       const price = parseFloat(formData.get('price'));
-      if (isNaN(price) || price <= 0) errors.price = 'Price musi być liczbą > 0.';
+      if (Number.isNaN(price) || price <= 0) errors.price = 'Price musi być liczbą > 0.';
       const bd = formData.get('birthDate');
       if (!bd || bd > todayISO) errors.birthDate = 'Birth date nie może być późniejsza niż dzis.';
       const code = formData.get('code') || '';
-      if (!/^[A-Za-z0-9\\-]{4,20}$/.test(code)) errors.code = 'Code: 4-20 znaków, litery/cyfry/myślnik.';
+      if (!/^[A-Za-z0-9\-]{4,20}$/.test(code)) errors.code = 'Code: 4-20 znaków, litery/cyfry/myślnik.';
       return errors;
     }
 
     function clearErrors() {
-      document.querySelectorAll('.error').forEach(e => e.textContent = '');
+      document.querySelectorAll('.error').forEach(e => e.textContent='');
       document.querySelectorAll('input').forEach(i => i.classList.remove('field-error'));
       document.getElementById('form-general-error').textContent = '';
     }
@@ -81,24 +167,14 @@
       e.preventDefault();
       clearErrors();
 
-      if (!form.checkValidity()) {
-        Array.from(form.elements).forEach(el => {
-          if (el.willValidate && !el.checkValidity()) {
-            const msg = el.validationMessage || 'Błąd w polu';
-            document.querySelector(`.error[data-for="${el.name}"]`).textContent = msg;
-            el.classList.add('field-error');
-          }
-        });
-        return;
-      }
-
       const fd = new FormData(form);
       const clientErrors = validateClient(fd);
+
       if (Object.keys(clientErrors).length) {
-        Object.entries(clientErrors).forEach(([k, v]) => {
-          document.querySelector(`.error[data-for="${k}"]`).textContent = v;
+        Object.entries(clientErrors).forEach(([k,v]) => {
           const el = document.querySelector(`[name="${k}"]`);
           if (el) el.classList.add('field-error');
+          document.querySelector(`.error[data-for="${k}"]`).textContent = v;
         });
         return;
       }
@@ -107,20 +183,19 @@
       payload.price = parseFloat(payload.price);
 
       try {
-        const res = await fetch('/api/items', {
+        const res = await fetch('http://localhost:4000/api/items', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+
         if (!res.ok) {
-          const body = await res.json().catch(() => ({message:'Błąd serwera'}));
-          if (body.fieldErrors) {
-            showFieldErrors(body.fieldErrors);
-          } else {
-            document.getElementById('form-general-error').textContent = body.message || 'Błąd';
-          }
+          const body = await res.json().catch(()=>({message:'Błąd serwera'}));
+          if (body.fieldErrors) showFieldErrors(body.fieldErrors);
+          else document.getElementById('form-general-error').textContent = body.message || 'Błąd';
           return;
         }
+
         alert('Sukces!');
         form.reset();
       } catch (err) {
