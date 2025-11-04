@@ -14,6 +14,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+app.get('/api/items', (req, res) => {
+  const items = Array.from(db.values());
+  res.json(items);
+});
+
 app.post('/api/items', (req, res) => {
   try {
     const parsed = itemSchema.parse(req.body);

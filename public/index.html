@@ -10,6 +10,7 @@
       background-color: #f7f9fc;
       color: #333;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
@@ -23,6 +24,7 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 450px;
+      margin-bottom: 2rem;
     }
 
     h1 {
@@ -85,6 +87,24 @@
       margin-top: 1rem;
       font-weight: 500;
     }
+
+    #items-list {
+      width: 100%;
+      max-width: 600px;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .item {
+      border-bottom: 1px solid #ddd;
+      padding: 0.5rem 0;
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
   </style>
 </head>
 <body>
@@ -117,7 +137,7 @@
 
       <label>
         Code
-        <input id="code" name="code" required pattern="^[A-Za-z0-9\-]{4,20}$" />
+        <input id="code" name="code" required pattern="^[A-Za-z0-9\\-]{4,20}$" />
         <div class="error" data-for="code"></div>
       </label>
 
@@ -126,22 +146,26 @@
     </form>
   </div>
 
+  <div id="items-list"></div>
+
   <script>
+    const API_URL = 'https://product-validation-app.onrender.com/api/items';
     const form = document.getElementById('form');
     const todayISO = new Date().toISOString().slice(0,10);
+    const list = document.getElementById('items-list');
 
     function validateClient(formData) {
       const errors = {};
       const name = formData.get('name')?.trim() || '';
       if (!name || name.length < 3 || name.length > 50) errors.name = 'Name: 3-50 znaków.';
       const email = formData.get('email') || '';
-      if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = 'Niepoprawny format email.';
+      if (!/^\\S+@\\S+\\.\\S+$/.test(email)) errors.email = 'Niepoprawny format email.';
       const price = parseFloat(formData.get('price'));
       if (Number.isNaN(price) || price <= 0) errors.price = 'Price musi być liczbą > 0.';
       const bd = formData.get('birthDate');
       if (!bd || bd > todayISO) errors.birthDate = 'Birth date nie może być późniejsza niż dzis.';
       const code = formData.get('code') || '';
-      if (!/^[A-Za-z0-9\-]{4,20}$/.test(code)) errors.code = 'Code: 4-20 znaków, litery/cyfry/myślnik.';
+      if (!/^[A-Za-z0-9\\-]{4,20}$/.test(code)) errors.code = 'Code: 4-20 znaków, litery/cyfry/myślnik.';
       return errors;
     }
 
@@ -163,10 +187,30 @@
       });
     }
 
+    async function loadItems() {
+      list.innerHTML = '';
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (!data.length) {
+          list.innerHTML = '<p>Brak produktów</p>';
+          return;
+        }
+        data.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `<strong>${item.name}</strong> — ${item.email} — ${item.price} zł — ${item.code}`;
+          list.appendChild(div);
+        });
+      } catch {
+        list.innerHTML = '<p>Błąd ładowania produktów.</p>';
+      }
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       clearErrors();
-
       const fd = new FormData(form);
       const clientErrors = validateClient(fd);
 
@@ -183,7 +227,7 @@
       payload.price = parseFloat(payload.price);
 
       try {
-        const res = await fetch('https://product-validation-app.onrender.com/api/items', {
+        const res = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -198,10 +242,13 @@
 
         alert('Sukces!');
         form.reset();
-      } catch (err) {
+        loadItems();
+      } catch {
         document.getElementById('form-general-error').textContent = 'Brak połączenia z serwerem.';
       }
     });
+
+    loadItems();
   </script>
 </body>
 </html>
