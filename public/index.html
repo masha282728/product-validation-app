@@ -159,7 +159,7 @@
       const name = formData.get('name')?.trim() || '';
       if (!name || name.length < 3 || name.length > 50) errors.name = 'Name: 3-50 znaków.';
       const email = formData.get('email') || '';
-      if (!/^\\S+@\\S+\\.\\S+$/.test(email)) errors.email = 'Niepoprawny format email.';
+      if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = 'Niepoprawny format email.';
       const price = parseFloat(formData.get('price'));
       if (Number.isNaN(price) || price <= 0) errors.price = 'Price musi być liczbą > 0.';
       const bd = formData.get('birthDate');
